@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Take a Picture and Upload - ThroatScan</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        /* General styles for layout */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #74ebd5 0%, #ACB6E5 100%);
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .container {
+            width: 100%;
+            max-width: 480px;
+            text-align: center;
+            padding: 20px;
+        }
+        .title-box {
+            background-color: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        }
+        .title {
+            font-size: 36px;
+            font-weight: 600;
+            color: #3498db;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+        .form-box {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+        input[type="file"] {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        input[type="submit"] {
+            background-color: #3498db;
+            color: white;
+            padding: 14px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            width: 100%;
+        }
+        .message-box {
+            background-color: #f9f9f9;
+            padding: 84px; /* Increased padding to make the box bigger */
+            border-radius: 24px;
+            margin-top: 10px;
+            display: none;
+            text-align: left;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1); /* Optional shadow for emphasis */
+        }
+        .message {
+            font-size: 14px; /* Slightly larger text for better readability */
+            color: #2c3e50;
+            white-space: pre-line;
+        }
+        .error-message {
+            font-size: 16px;
+            color: red;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Main container -->
+    <div class="container">
+
+        <!-- Box for Title -->
+        <div class="title-box">
+            <div class="title">ThroatScan</div>
+        </div>
+
+        <!-- Box for Form -->
+        <div class="form-box">
+            <h2>Take a Picture and Upload</h2>
+            <form id="uploadForm" enctype="multipart/form-data">
+                <input type="file" accept="image/*" capture="environment" name="image" id="fileInput">
+                <input type="submit" value="Upload Image">
+            </form>
+        </div>
+
+        <!-- Box for Messages -->
+        <div class="message-box" id="resultBox">
+            <div class="message" id="predictionMessage"></div>
+            <div class="error-message" id="errorMessage"></div>
+        </div>
+    </div>
+
+    <script>
+        const form = document.getElementById('uploadForm');
+        const fileInput = document.getElementById('fileInput');
+        const predictionMessage = document.getElementById('predictionMessage');
+        const resultBox = document.getElementById('resultBox');
+        const errorMessage = document.getElementById('errorMessage');
+
+        form.addEventListener('submit', function (event) {
+            event.preventDefault();
+
+            const formData = new FormData();
+            formData.append('image', fileInput.files[0]);
+
+            fetch('/upload', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Show the detailed prediction message
+                    predictionMessage.innerText = data.message;
+                    resultBox.style.display = 'block';
+                    errorMessage.style.display = 'none';
+                } else {
+                    errorMessage.innerText = data.message;
+                    errorMessage.style.display = 'block';
+                    resultBox.style.display = 'none';
+                }
+            })
+            .catch(() => {
+                errorMessage.innerText = 'An error occurred. Please try again.';
+                errorMessage.style.display = 'block';
+                resultBox.style.display = 'none';
+            });
+        });
+    </script>
+
+</body>
+</html>
